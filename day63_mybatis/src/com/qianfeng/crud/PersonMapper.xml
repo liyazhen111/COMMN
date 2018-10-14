@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 习惯上写实体类的包名+类名的形式 -->
+<mapper namespace="com.qianfeng.crud.Person">
+	<!-- 查询到的数据和实体类之间的映射关系 -->
+	<!-- type 可以使用别名,通过<typeAlias>配置
+		id resultMap的唯一标示
+	 -->
+	<resultMap type="Person" id="personMap">
+		<!-- 主键 的映射关系-->
+		<!-- property 实体类中的属性
+			column 表中的字段
+		 -->
+		<id property="id" column="id"/>
+		<!-- 其他字段的映射关系 -->
+		<result property="name" column="name" />
+		<result property="perage" column="age" />
+	</resultMap>
+	
+	<!-- 映射文件中写相关操作的sql语句 -->
+	<!-- insert标签  插入操作
+		id 唯一的
+	 -->
+	<insert id="add">
+		insert into person(name) values("haha")
+	</insert>
+	
+	<!-- parameterType 参数类型（sql语句中用到的参数） ,只能有一个参数
+		string本质上是java.lang.String的别名
+		
+		类似 void add1(String name){}
+	-->
+	<insert id="add1" parameterType="string">
+	<!-- 如果传来的数据是基本类型，使用#{}读取参数值时，{}里的内容可以随便写 -->
+		<!-- insert into person(name) values(#{name}) -->
+		insert into person(name) values(#{aaa})
+	</insert>
+	
+	<!-- add2(Person person){}
+		parameterType 可以使用别名
+		parameterType="Person" 
+		parameterType="com.qianfeng.crud.Person" 
+	 -->
+	<insert id="add2" parameterType="Person" >
+	<!-- 本例中，name和age是Person对象中的属性，本质上是通过get方法获取值 -->
+		<!-- insert into person(name, age) values('hehe', '30')  -->
+		<!-- insert into person(name, age) values(#{name}, #{age}) -->
+		
+		<!-- ${} 获取的内容原样输出，相当于进行字符串的拼接生成sql语句
+			一般情况下，优先使用#{}
+		 -->
+		<!-- insert into person(name, age) values(hehe, 30)  -->
+		<!-- insert into person(name, age) values(${name}, ${age}) -->
+		insert into person(age) values(${age})
+	</insert>
+	
+	<!-- 查询 -->
+	<select id="findAll" parameterType="string" resultType="Person">
+		<!-- select * from #{table}  select * from 'person' -->
+		<!-- 基本的类型不能使用$ -->
+		select * from ${table}
+	</select>
+	
+	<select id="findAll2" parameterType="map" resultType="Person">
+		<!-- select * from #{table}  select * from 'person' -->
+		select * from ${table}
+	</select>
+	
+	<!-- resultType 指定返回值的类型 
+			如果返回的是列表，只需要指定列表中元素的类型即可
+	-->
+	<select id="findAll3" resultType="Person">
+		select * from person
+	</select>
+	
+	<!-- 查询一个字段 -->
+	<select id="findName" resultType="string">
+		select name from person
+	</select>
+	
+	<!-- 可以将查询的数据封装到map对象中 -->
+	<select id="findNameAndAge" resultType="map">
+		select name,age from person
+	</select>
+	
+	<select id="findById" parameterType="int" resultType="Person">
+		select * from person where id=#{id}
+	</select>
+	
+	<!-- resultMap 结果映射，对应的值是<resultMap>标签的id值 -->
+	<!-- 当类中的属性名和表中的字段名不一致时，要想成功绑定数据，就需要使用resultMap进行映射 -->
+	<select id="findByName" parameterType="string" resultMap="personMap">
+		select id,name,age from person where name=#{name}
+	</select>
+	
+	<!-- 绑定数据时，发现Person中没有age属性（没有age的get和set方法），所以无法绑定
+		可以通过字段的别名解决
+	 -->
+	<select id="findByName2" parameterType="string" resultType="Person">
+		select id,name,age as perage from person where name=#{name}
+	</select>
+	
+	<delete id="deleteById" parameterType="int">
+		delete from person where id=#{id}
+	</delete>
+	
+	
+	<update id="update" parameterType="Person">
+		update person set name=#{name},age=#{perage} where id=#{id}
+	</update>
+	
+	
+</mapper>
+
+
+
+

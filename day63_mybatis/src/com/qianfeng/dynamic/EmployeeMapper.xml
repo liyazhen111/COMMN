@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 习惯上写实体类的包名+类名的形式 -->
+<mapper namespace="com.qianfeng.dynamic.Employee">
+	<resultMap type="Employee" id="empMap">
+		<id property="id" column="id"/>
+		<result property="name" column="name" />
+		<result property="age" column="age" />
+		<result property="phone" column="phone" />
+		<result property="qq" column="qq" />
+	</resultMap>
+	
+	<insert id="add" parameterType="Employee">
+		<!-- insert into employee(name,age,phone,qq) values(#{name},#{age},#{phone},#{qq}) -->
+		insert into employee(
+		<!-- trim 设置前缀和后缀
+			suffixOverrides="," 相当于删除最后的逗号
+		 -->
+		<trim suffixOverrides=",">
+		<!-- if 单条件判断，test中设置判断条件 -->
+			<if test="name!=null">
+				name,
+			</if>
+			<if test="age!=null">
+				age,
+			</if>
+			<if test="phone!=null">
+				phone,
+			</if>
+			<if test="qq!=null">
+				qq
+			</if>
+		</trim>
+		) values(
+		<trim suffixOverrides=",">
+			<if test="name!=null">
+				#{name},
+			</if>
+			<if test="age!=null">
+				#{age},
+			</if>
+			<if test="phone!=null">
+				#{phone},
+			</if>
+			<if test="qq!=null">
+				#{qq}
+			</if>
+		</trim>
+		)
+	
+	</insert>
+	
+	<insert id="add2" parameterType="Employee">
+	<!-- insert into employee( name ) values( ? ) -->
+		insert into employee(
+		<!-- 多条件判断  相当于if ... else if... else-->
+			<choose>
+				<when test="name!=null">
+					name
+				</when>
+				<when test="age!=null">
+					age
+				</when>
+				<when test="phone!=null">
+					phone
+				</when>
+				<otherwise>
+					qq
+				</otherwise>
+			</choose>
+			
+			
+		) values(
+			<choose>
+				<when test="name!=null">
+					#{name}
+				</when>
+				<when test="age!=null">
+					#{age}
+				</when>
+				<when test="phone!=null">
+					#{phone}
+				</when>
+				<otherwise>
+					#{qq}
+				</otherwise>
+			</choose>
+		)
+	</insert>
+	
+	<select id="find" parameterType="Employee" resultType="Employee">
+		<!-- select * from employee where 1=1 and name=? and age=? -->
+	
+		select * from employee
+		<!-- 将多余的前缀，比如and，自动删掉 -->
+		<where>
+			<if test="name!=null">
+				and name=#{name}
+			</if>
+			<if test="age!=null">
+				and age=#{age}
+			</if>
+			
+		</where>
+	
+	</select>
+	
+	<update id="update" parameterType="Employee">
+		<!-- update employee set name=?,age=?,phone=? where .. -->
+		update employee 
+		<!-- 自动将多余的逗号删除 -->
+		<set>
+			<if test="name!=null">
+				name=#{name},
+			</if>
+			<if test="age!=null">
+				age=#{age},
+			</if>
+			<if test="phone!=null">
+				phone=#{phone},
+			</if>
+			<if test="qq!=null">
+				qq=#{qq}
+			</if>
+		</set>
+		where id=#{id}
+		
+		
+	</update>
+	
+	<!--  2, 5, 10 
+		in 后跟着一个范围
+		本例表示删除id是1,2,6的记录
+	 -->
+	<!-- <delete id="deleteByIds" parameterType="list"> -->
+	<delete id="deleteByIds" parameterType="map">
+		<!-- delete from employee where id in (1, 2, 6) -->
+		delete from employee where id in
+		<!-- 遍历 
+			collection 要遍历数据
+			item 遍历到的元素的变量名
+			open/close 指定前面和后面包裹数据时使用的符号
+			separator 遍历到的元素的分隔符
+		-->
+		<foreach collection="list" item="eid" open="(" close=")" separator=",">
+			#{eid}
+		</foreach>
+		
+	</delete>
+	<!-- sql中使用的参数，本质上会封装为map对象 
+	
+		基本类型   key值随便写
+		自定义类的对象：  key 属性， value 设置的值
+		数组： key值是array，value是数组对象
+		列表：key值是list，value是列表对象
+		map结构
+	 -->
+	<delete id="deleteByIds2" parameterType="map">
+		<!-- delete from employee where id in (1, 2, 6) -->
+		delete from employee where id in
+		<!-- 遍历 
+			collection 要遍历数据
+			item 遍历到的元素的变量名
+			open/close 指定前面和后面包裹数据时使用的符号
+			separator 遍历到的元素的分隔符
+		-->
+		<foreach collection="array" item="eid" open="(" close=")" separator=",">
+			#{eid}
+		</foreach>
+		
+	</delete>
+	
+	
+</mapper>
+
+
+
+

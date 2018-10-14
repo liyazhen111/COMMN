@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 命名空间，唯一 -->
+<mapper namespace="personMapper">
+	<!-- 查询到的数据和实体类之间的映射关系 -->
+	<!-- type 实体类 包名+类名
+		id resultMap的唯一标示
+	 -->
+	<resultMap type="com.qianfeng.first.Person" id="personMap">
+		<!-- 主键 的映射关系-->
+		<!-- property 实体类中的属性
+			column 表中的字段
+		 -->
+		<id property="id" column="id"/>
+		<!-- 其他字段的映射关系 -->
+		<result property="name" column="name" />
+	</resultMap>
+	
+	<!-- 映射文件中写相关操作的sql语句 -->
+	<!-- insert标签  插入操作
+		id 唯一的
+	 -->
+	<insert id="add">
+		insert into person(name) values("haha")
+	</insert>
+	
+</mapper>
+
+
+
+
